@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Download,
   ExternalLink,
@@ -12,11 +12,14 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useTranslation } from "react-i18next";
 import { toast } from "@/lib/toast";
 import { getVersion } from "@tauri-apps/api/app";
 import { settingsApi } from "@/lib/api";
 import { useUpdate } from "@/contexts/UpdateContext";
+import { useSaveSettingsMutation, useSettingsQuery } from "@/lib/query";
+import { compareVersions } from "@/lib/version";
 import { Badge } from "@/components/ui/badge";
 import { WhatsNewDialog } from "@/components/WhatsNewDialog";
 import { WHATS_NEW_ENTRIES, entriesUpTo } from "@/lib/whatsNew";
@@ -32,6 +35,27 @@ let appVersionCache: string | null = null;
 
 // 邀 Star 条关掉后记在本机（纯界面偏好，不进库、不随云同步）
 const STAR_PROMPT_DISMISSED_KEY = "ccswitch:about:starPromptDismissed";
+
+// 官方版本只用于同步提醒，缓存 6 小时，避免每次打开关于页都请求
+const OFFICIAL_VERSION_CACHE_KEY = "ccswitch:about:officialVersion";
+const OFFICIAL_VERSION_CHECKED_AT_KEY =
+  "ccswitch:about:officialVersionCheckedAt";
+const OFFICIAL_VERSION_TTL_MS = 6 * 60 * 60 * 1000;
+
+function readCachedOfficialVersion(): string | null {
+  try {
+    const version = localStorage.getItem(OFFICIAL_VERSION_CACHE_KEY);
+    const checkedAt = Number(
+      localStorage.getItem(OFFICIAL_VERSION_CHECKED_AT_KEY) ?? "0",
+    );
+    if (version && Date.now() - checkedAt < OFFICIAL_VERSION_TTL_MS) {
+      return version;
+    }
+  } catch {
+    // localStorage 不可用时忽略缓存
+  }
+  return null;
+}
 
 function readStarPromptDismissed(): boolean {
   try {
@@ -66,6 +90,28 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
   const { hasUpdate, updateInfo, checkUpdate, resetDismiss, isChecking } =
     useUpdate();
 
+  const { data: settings } = useSettingsQuery();
+  const saveSettings = useSaveSettingsMutation();
+  const [officialVersion, setOfficialVersion] = useState<string | null>(
+    readCachedOfficialVersion,
+  );
+  const [showMaintenance, setShowMaintenance] = useState(false);
+  const versionClickCount = useRef(0);
+  const officialPromptEnabled = settings?.officialUpdatePromptEnabled ?? true;
+  const baseVersion = useMemo(
+    () => (version ? version.split("-")[0] : ""),
+    [version],
+  );
+  const officialBehind = useMemo(
+    () =>
+      Boolean(
+        officialVersion &&
+          baseVersion &&
+          compareVersions(officialVersion, baseVersion) > 0,
+      ),
+    [baseVersion, officialVersion],
+  );
+
   useEffect(() => {
     let active = true;
     const loadAppVersion = async () => {
@@ -93,6 +139,44 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
     };
   }, []);
 
+  useEffect(() => {
+    let active = true;
+    let checkedAt = 0;
+    try {
+      checkedAt = Number(
+        localStorage.getItem(OFFICIAL_VERSION_CHECKED_AT_KEY) ?? "0",
+      );
+    } catch {
+      // localStorage 不可用时每次都检查
+    }
+    if (Date.now() - checkedAt < OFFICIAL_VERSION_TTL_MS) {
+      return;
+    }
+
+    settingsApi
+      .getOfficialLatestVersion()
+      .then((latest) => {
+        if (!active || !latest) return;
+        setOfficialVersion(latest);
+        try {
+          localStorage.setItem(OFFICIAL_VERSION_CACHE_KEY, latest);
+          localStorage.setItem(
+            OFFICIAL_VERSION_CHECKED_AT_KEY,
+            String(Date.now()),
+          );
+        } catch {
+          // 缓存失败不影响显示
+        }
+      })
+      .catch((error) => {
+        console.error("[AboutSection] Failed to check official version", error);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const handleOpenReleaseNotes = useCallback(async () => {
     try {
       const targetVersion = updateInfo?.availableVersion ?? version ?? "";
@@ -104,13 +188,13 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
 
       if (!displayVersion) {
         await settingsApi.openExternal(
-          "https://github.com/farion1231/cc-switch/releases",
+          "https://github.com/jlxzl/cc-switch/releases",
         );
         return;
       }
 
       await settingsApi.openExternal(
-        `https://github.com/farion1231/cc-switch/releases/tag/${displayVersion}`,
+        `https://github.com/jlxzl/cc-switch/releases/tag/${displayVersion}`,
       );
     } catch (error) {
       console.error("[AboutSection] Failed to open release notes", error);
@@ -119,8 +203,34 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
   }, [t, updateInfo?.availableVersion, version]);
 
   const handleOpenGithub = useCallback(() => {
-    void settingsApi.openExternal("https://github.com/farion1231/cc-switch");
+    void settingsApi.openExternal("https://github.com/jlxzl/cc-switch");
   }, []);
+
+  const handleVersionClick = useCallback(() => {
+    versionClickCount.current += 1;
+    if (versionClickCount.current >= 7) {
+      versionClickCount.current = 0;
+      setShowMaintenance((visible) => !visible);
+    }
+  }, []);
+
+  const handleToggleOfficialPrompt = useCallback(
+    (checked: boolean) => {
+      if (!settings) return;
+      saveSettings.mutate(
+        { ...settings, officialUpdatePromptEnabled: checked },
+        {
+          onError: (error) => {
+            toast.error(t("common.error"), {
+              description: extractErrorMessage(error) || undefined,
+              closeButton: true,
+            });
+          },
+        },
+      );
+    },
+    [saveSettings, settings, t],
+  );
 
   const handleDismissStarPrompt = useCallback(() => {
     setStarPromptDismissed(true);
@@ -204,12 +314,39 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
           className="h-10 w-10 shrink-0 p-1"
         />
         <div className="min-w-0 flex-1">
-          <div className="text-title text-fg-1">CC Switch</div>
+          <div className="text-title text-fg-1">CC Switch ZL</div>
           <div className="flex flex-wrap items-center gap-2 text-caption text-fg-2">
             {isLoadingVersion ? (
               <Loader2 className="h-3 w-3 animate-spin" />
             ) : (
-              <span className="tabular-nums">{`${t("common.version")} v${displayVersion}`}</span>
+              <>
+                <span
+                  className="cursor-default select-none tabular-nums"
+                  onClick={handleVersionClick}
+                >
+                  {`${t("settings.zlVersion")} v${displayVersion}`}
+                </span>
+                <span className="tabular-nums">
+                  {`${t("settings.officialVersion")} `}
+                  {officialVersion
+                    ? `v${officialVersion}`
+                    : t("settings.officialVersionUnknown")}
+                </span>
+                {officialVersion && officialPromptEnabled && (
+                  <Badge
+                    variant="outline"
+                    className={`gap-1 px-1.5 py-0 text-badge ${
+                      officialBehind
+                        ? "border-amber-500/40 text-amber-600 dark:text-amber-400"
+                        : "text-fg-2"
+                    }`}
+                  >
+                    {officialBehind
+                      ? t("settings.officialVersionBehind")
+                      : t("settings.officialVersionSynced")}
+                  </Badge>
+                )}
+              </>
             )}
             {isPortable && (
               <Badge
@@ -221,6 +358,22 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
               </Badge>
             )}
           </div>
+          {showMaintenance && (
+            <div className="mt-2 flex items-center gap-2 text-caption text-fg-2">
+              <Checkbox
+                id="official-update-prompt"
+                checked={officialPromptEnabled}
+                onCheckedChange={handleToggleOfficialPrompt}
+                disabled={!settings || saveSettings.isPending}
+              />
+              <label
+                htmlFor="official-update-prompt"
+                className="cursor-pointer select-none"
+              >
+                {t("settings.officialPromptLabel")}
+              </label>
+            </div>
+          )}
         </div>
         <Button
           type="button"
@@ -314,8 +467,7 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
         )}
       </div>
 
-      {/* 下载与更新都走 ccswitch.io，用户不再经过仓库页，邀 Star 单独占一行；按钮即 GitHub 入口。
-          关掉后链接行补回 GitHub 按钮 */}
+      {/* 更新走本仓库发布页，邀 Star 单独占一行；关掉后链接行补回 GitHub 按钮 */}
       {!starPromptDismissed && (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-3 bg-action-soft py-3.5 ps-5 pe-3">
           <div className="flex min-w-0 flex-1 items-center gap-3">

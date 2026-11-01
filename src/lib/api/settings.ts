@@ -81,6 +81,11 @@ export const settingsApi = {
     await invoke("check_for_updates");
   },
 
+  /** 官方最新版本，只用于同步提醒，不参与更新安装 */
+  async getOfficialLatestVersion(): Promise<string | null> {
+    return await invoke("get_official_latest_version");
+  },
+
   async openPortableUpdateDownload(version: string): Promise<void> {
     await invoke("open_portable_update_download", { version });
   },

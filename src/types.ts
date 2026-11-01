@@ -479,6 +479,8 @@ export interface Settings {
   newLayoutNoticeConfirmed?: boolean;
   // Highest app version whose "what's new" summary the user has seen on this device
   whatsNewSeenVersion?: string;
+  // 关于页是否提示官方新版本（只用于提醒同步上游，不影响 Z 版本的更新）
+  officialUpdatePromptEnabled?: boolean;
   // User has confirmed the auto-sync traffic warning
   autoSyncConfirmed?: boolean;
   // User has confirmed the common config first-run notice

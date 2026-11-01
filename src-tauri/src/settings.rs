@@ -529,6 +529,9 @@ pub struct AppSettings {
     /// Highest app version whose "what's new" summary the user has seen on this device
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub whats_new_seen_version: Option<String>,
+    /// 关于页是否提示官方新版本（只用于提醒同步上游，不影响 Z 版本的更新）
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub official_update_prompt_enabled: Option<bool>,
     /// User has confirmed the common config first-run notice
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub common_config_confirmed: Option<bool>,
@@ -689,6 +692,7 @@ impl Default for AppSettings {
             first_run_notice_confirmed: None,
             new_layout_notice_confirmed: None,
             whats_new_seen_version: None,
+            official_update_prompt_enabled: None,
             common_config_confirmed: None,
             language: None,
             quota_display: None,

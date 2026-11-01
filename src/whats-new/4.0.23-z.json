@@ -1,0 +1,26 @@
+{
+  "version": "4.0.23-z",
+  "items": [
+    {
+      "type": "new",
+      "zh": "关于页同时显示 Z 版本和官方版本，更新只走本仓库",
+      "zh-TW": "關於頁同時顯示 Z 版本和官方版本，更新只走本儲存庫",
+      "en": "The About page shows both the Z and upstream versions; updates come only from this repository",
+      "ja": "About ページに Z バージョンと公式バージョンを併記し、更新はこのリポジトリのみから取得"
+    },
+    {
+      "type": "improve",
+      "zh": "官方新版本只做同步提醒，可在关于页隐藏开关里控制",
+      "zh-TW": "官方新版本只做同步提醒，可在關於頁隱藏開關裡控制",
+      "en": "Upstream releases are shown only as a sync hint and can be toggled off in a hidden About option",
+      "ja": "公式の新バージョンは同期のヒントとしてのみ表示し、About の隠し設定で切り替え可能"
+    },
+    {
+      "type": "improve",
+      "zh": "Star 邀请改为指向 ZL 仓库",
+      "zh-TW": "Star 邀請改為指向 ZL 儲存庫",
+      "en": "The star invitation now points to the ZL repository",
+      "ja": "スターのお願いは ZL リポジトリを指すように変更"
+    }
+  ]
+}

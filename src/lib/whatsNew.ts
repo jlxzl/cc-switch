@@ -27,10 +27,13 @@ const modules = import.meta.glob<WhatsNewEntry>("../whats-new/*.json", {
   import: "default",
 });
 
-/** 所有版本的摘要，新到旧 */
-export const WHATS_NEW_ENTRIES: WhatsNewEntry[] = Object.values(modules).sort(
-  (a, b) => compareVersions(b.version, a.version),
-);
+/** Z 版本摘要；上游版本的条目不进入 Z 版的「近期更新」 */
+const isZlVersion = (version: string) => /-z(?:\.|$)/.test(version);
+
+/** 本仓库 Z 版本的摘要，新到旧 */
+export const WHATS_NEW_ENTRIES: WhatsNewEntry[] = Object.values(modules)
+  .filter((entry) => isZlVersion(entry.version))
+  .sort((a, b) => compareVersions(b.version, a.version));
 
 /** 当前版本比记录的已看版本新（或从没记录过）：需要处理一次 */
 export function isNewerThanSeen(
@@ -88,12 +91,11 @@ export function resolveWhatsNewLanguage(language: string): WhatsNewLanguage {
     : "en";
 }
 
-/** 官网更新日志：不带版本是列表页。官网只有 zh / en / ja，繁中用简中页面 */
+/** 本仓库发布日志：不带版本是列表页，带版本是 tag 页 */
 export function changelogUrl(
-  language: WhatsNewLanguage,
+  _language: WhatsNewLanguage,
   version?: string,
 ): string {
-  const siteLanguage = language === "zh-TW" ? "zh" : language;
-  const base = `https://ccswitch.io/${siteLanguage}/changelog`;
-  return version ? `${base}/${version}` : base;
+  const base = "https://github.com/jlxzl/cc-switch/releases";
+  return version ? `${base}/tag/v${version.replace(/^v/, "")}` : base;
 }

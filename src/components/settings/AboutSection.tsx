@@ -19,7 +19,7 @@ import { getVersion } from "@tauri-apps/api/app";
 import { settingsApi } from "@/lib/api";
 import { useUpdate } from "@/contexts/UpdateContext";
 import { useSaveSettingsMutation, useSettingsQuery } from "@/lib/query";
-import { compareVersions } from "@/lib/version";
+import { compareVersions, toPublicVersion } from "@/lib/version";
 import { Badge } from "@/components/ui/badge";
 import { WhatsNewDialog } from "@/components/WhatsNewDialog";
 import { WHATS_NEW_ENTRIES, entriesUpTo } from "@/lib/whatsNew";
@@ -180,13 +180,10 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
   const handleOpenReleaseNotes = useCallback(async () => {
     try {
       const targetVersion = updateInfo?.availableVersion ?? version ?? "";
-      const displayVersion = targetVersion.startsWith("v")
-        ? targetVersion
-        : targetVersion
-          ? `v${targetVersion}`
-          : "";
+      const publicTarget = toPublicVersion(targetVersion.replace(/^v/, ""));
+      const tag = publicTarget ? `v${publicTarget}` : "";
 
-      if (!displayVersion) {
+      if (!tag) {
         await settingsApi.openExternal(
           "https://github.com/jlxzl/cc-switch/releases",
         );
@@ -194,7 +191,7 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
       }
 
       await settingsApi.openExternal(
-        `https://github.com/jlxzl/cc-switch/releases/tag/${displayVersion}`,
+        `https://github.com/jlxzl/cc-switch/releases/tag/${tag}`,
       );
     } catch (error) {
       console.error("[AboutSection] Failed to open release notes", error);
@@ -246,7 +243,7 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
       if (isPortable) {
         try {
           await settingsApi.openPortableUpdateDownload(
-            updateInfo?.availableVersion ?? "",
+            toPublicVersion(updateInfo?.availableVersion ?? ""),
           );
         } catch (error) {
           console.error("[AboutSection] Portable update failed", error);
@@ -302,7 +299,9 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
     updateInfo?.availableVersion,
   ]);
 
-  const displayVersion = version ?? t("common.unknown");
+  const displayVersion = version
+    ? toPublicVersion(version)
+    : t("common.unknown");
 
   return (
     <div className="divide-y divide-border overflow-hidden rounded-panel border border-border bg-surface">
@@ -391,7 +390,7 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
             <>
               <Download className="h-3.5 w-3.5" />
               {t("settings.updateTo", {
-                version: updateInfo?.availableVersion ?? "",
+                version: toPublicVersion(updateInfo?.availableVersion ?? ""),
               })}
             </>
           ) : isChecking ? (
@@ -412,7 +411,7 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
         <div className="space-y-1 px-5 py-4 text-body">
           <p className="font-medium text-fg-1">
             {t("settings.updateAvailable", {
-              version: updateInfo.availableVersion,
+              version: toPublicVersion(updateInfo.availableVersion),
             })}
           </p>
           {updateInfo.notes && (

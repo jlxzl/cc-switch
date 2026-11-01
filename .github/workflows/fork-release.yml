@@ -1,11 +1,11 @@
 name: Fork Release (Windows)
 
-# 手动触发或推送 v*-z* 标签时，构建 Windows x64 安装包并发 GitHub Release。
+# 手动触发或推送 v* 标签（对外版本号，如 v4.0.23.1）时，构建 Windows x64 安装包并发 GitHub Release。
 # 安装包用仓库自己的签名密钥签名，旧版 Z 应用通过 latest.json 自动更新。
 on:
   push:
     tags:
-      - 'v*-z*'
+      - 'v*'
   workflow_dispatch:
 
 permissions:
@@ -62,14 +62,19 @@ jobs:
         id: version
         shell: bash
         run: |
+          internal=$(node -p "require('./package.json').version")
+          display=$(printf '%s' "$internal" | sed -E 's/-z\.([0-9]+)$/.\1/; s/-z$//')
           if [ "$GITHUB_REF_TYPE" = "tag" ]; then
-            version="${GITHUB_REF_NAME#v}"
-          else
-            version=$(node -p "require('./package.json').version")
+            ref_version="${GITHUB_REF_NAME#v}"
+            if [ "$ref_version" != "$display" ]; then
+              echo "tag $ref_version does not match package.json $internal (display $display)" >&2
+              exit 1
+            fi
           fi
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "tag=v$version" >> "$GITHUB_OUTPUT"
-          echo "Building $version"
+          echo "version=$internal" >> "$GITHUB_OUTPUT"
+          echo "display=$display" >> "$GITHUB_OUTPUT"
+          echo "tag=v$display" >> "$GITHUB_OUTPUT"
+          echo "Building $internal (public $display)"
 
       - name: Build Windows installer
         shell: bash
@@ -81,7 +86,7 @@ jobs:
       - name: Prepare release assets
         shell: pwsh
         env:
-          VERSION: ${{ steps.version.outputs.version }}
+          DISPLAY: ${{ steps.version.outputs.display }}
         run: |
           $ErrorActionPreference = 'Stop'
           New-Item -ItemType Directory -Force -Path release-assets | Out-Null
@@ -89,7 +94,7 @@ jobs:
           $installer = Get-ChildItem -Path 'src-tauri/target/release/bundle/nsis' -Recurse -Include *-setup.exe |
             Select-Object -First 1
           if ($null -eq $installer) { throw 'No NSIS installer found' }
-          $installerName = "CC-Switch-ZL-$env:VERSION-Windows-Setup.exe"
+          $installerName = "CC-Switch-ZL-$env:DISPLAY-Windows-Setup.exe"
           Copy-Item $installer.FullName (Join-Path release-assets $installerName)
 
           $sig = Get-ChildItem -Path 'src-tauri/target/release/bundle/nsis' -Recurse -Include *-setup.exe.sig |
@@ -99,7 +104,7 @@ jobs:
 
           $exe = 'src-tauri/target/release/cc-switch.exe'
           if (-not (Test-Path $exe)) { throw 'No cc-switch.exe found' }
-          $zipName = "CC-Switch-ZL-$env:VERSION-Windows-Portable.zip"
+          $zipName = "CC-Switch-ZL-$env:DISPLAY-Windows-Portable.zip"
           Compress-Archive -Path $exe -DestinationPath (Join-Path release-assets $zipName) -Force
 
           Get-ChildItem release-assets | Select-Object Name, Length
@@ -107,10 +112,10 @@ jobs:
       - name: Prepare release body
         shell: pwsh
         env:
-          VERSION: ${{ steps.version.outputs.version }}
+          DISPLAY: ${{ steps.version.outputs.display }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $notesPath = "docs/release-notes/zl/v$env:VERSION.md"
+          $notesPath = "docs/release-notes/zl/v$env:DISPLAY.md"
           if (Test-Path $notesPath) {
             $body = [System.IO.File]::ReadAllText(
               (Resolve-Path $notesPath),
@@ -120,14 +125,14 @@ jobs:
             $body = [regex]::Replace($body, '(\r?\n){3,}', "`n`n")
           } else {
             $lines = @(
-              "## CC Switch ZL $env:VERSION",
+              "## CC Switch ZL $env:DISPLAY",
               "",
               "Windows x64 非官方定制构建。",
               "",
               "官方仓库：https://github.com/farion1231/cc-switch",
               "",
-              "- ``CC-Switch-ZL-$env:VERSION-Windows-Setup.exe``：安装版",
-              "- ``CC-Switch-ZL-$env:VERSION-Windows-Portable.zip``：便携版，解压即用",
+              "- ``CC-Switch-ZL-$env:DISPLAY-Windows-Setup.exe``：安装版",
+              "- ``CC-Switch-ZL-$env:DISPLAY-Windows-Portable.zip``：便携版，解压即用",
               "",
               "> 安装包未做 Windows 代码签名，SmartScreen 可能提示；更新包本身已用本仓库密钥签名。"
             )
@@ -143,6 +148,7 @@ jobs:
         shell: pwsh
         env:
           VERSION: ${{ steps.version.outputs.version }}
+          DISPLAY: ${{ steps.version.outputs.display }}
         run: |
           $ErrorActionPreference = 'Stop'
           $setup = Get-ChildItem -Path release-assets -Filter '*-Windows-Setup.exe' |
@@ -150,9 +156,9 @@ jobs:
           $sig = Get-ChildItem -Path release-assets -Filter '*-Windows-Setup.exe.sig' |
             Select-Object -First 1
           if ($null -eq $setup -or $null -eq $sig) { throw 'Missing NSIS installer or signature' }
-          $tag = "v$env:VERSION"
-          $notesPath = "docs/release-notes/zl/v$env:VERSION.md"
-          $summary = "CC Switch ZL $env:VERSION"
+          $tag = "v$env:DISPLAY"
+          $notesPath = "docs/release-notes/zl/v$env:DISPLAY.md"
+          $summary = "CC Switch ZL $env:DISPLAY"
           if (Test-Path $notesPath) {
             $notesText = [System.IO.File]::ReadAllText(
               (Resolve-Path $notesPath),
@@ -184,7 +190,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          name: CC Switch ZL ${{ steps.version.outputs.version }}
+          name: CC Switch ZL ${{ steps.version.outputs.display }}
           prerelease: false
           draft: false
           fail_on_unmatched_files: true

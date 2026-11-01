@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useNewLayoutNoticePending } from "@/components/shell/NewLayoutDialog";
 import { settingsApi } from "@/lib/api";
 import { useSettingsQuery } from "@/lib/query";
+import { toPublicVersion } from "@/lib/version";
 import {
   WHATS_NEW_ENTRIES,
   changelogUrl,
@@ -49,6 +50,8 @@ export function WhatsNewDialog({
   const { t, i18n } = useTranslation();
   const language = resolveWhatsNewLanguage(i18n.language);
   const [showAll, setShowAll] = useState(false);
+  const displayUpdatedTo = updatedTo ? toPublicVersion(updatedTo) : undefined;
+  const displaySince = since ? toPublicVersion(since) : undefined;
 
   const visible = showAll ? entries : entries.slice(0, EXPANDED_VERSIONS);
   const hiddenCount = entries.length - visible.length;
@@ -85,13 +88,13 @@ export function WhatsNewDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-fg-1" />
-            {updatedTo
-              ? t("whatsNew.updatedTo", { version: updatedTo })
+            {displayUpdatedTo
+              ? t("whatsNew.updatedTo", { version: displayUpdatedTo })
               : t("whatsNew.recentTitle")}
           </DialogTitle>
-          {since && (
+          {displaySince && (
             <DialogDescription>
-              {t("whatsNew.since", { version: since })}
+              {t("whatsNew.since", { version: displaySince })}
             </DialogDescription>
           )}
         </DialogHeader>
@@ -100,7 +103,7 @@ export function WhatsNewDialog({
             <section key={entry.version}>
               <div className="flex items-center justify-between gap-3">
                 <h3 className="text-strong tabular-nums text-fg-1">
-                  v{entry.version}
+                  v{toPublicVersion(entry.version)}
                 </h3>
                 <button
                   type="button"

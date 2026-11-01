@@ -117,7 +117,8 @@ pub async fn get_official_latest_version() -> Result<Option<String>, String> {
 }
 
 /// 便携版新版本压缩包的下载地址，命名与本仓库发布工作流的「Prepare release assets」一致：
-/// `CC-Switch-ZL-<版本>-Windows[-arm64]-Portable.zip`。版本号不像版本号时返回 None。
+/// `CC-Switch-ZL-<对外版本>-Windows[-arm64]-Portable.zip`。调用方传对外版本（如 `4.0.23.1`），
+/// 内部 semver 的 `-z` 后缀不进入 URL。版本号不像版本号时返回 None。
 fn portable_zip_url(version: &str, arm64: bool) -> Option<String> {
     let version = version.trim().trim_start_matches('v');
     let looks_like_version = version.starts_with(|c: char| c.is_ascii_digit())
@@ -6922,12 +6923,12 @@ mod tests {
     #[test]
     fn portable_zip_url_matches_release_asset_names() {
         assert_eq!(
-            portable_zip_url("4.0.19-z", false).as_deref(),
-            Some("https://github.com/jlxzl/cc-switch/releases/download/v4.0.19-z/CC-Switch-ZL-4.0.19-z-Windows-Portable.zip")
+            portable_zip_url("4.0.23", false).as_deref(),
+            Some("https://github.com/jlxzl/cc-switch/releases/download/v4.0.23/CC-Switch-ZL-4.0.23-Windows-Portable.zip")
         );
         assert_eq!(
-            portable_zip_url("v4.0.19-z.2", true).as_deref(),
-            Some("https://github.com/jlxzl/cc-switch/releases/download/v4.0.19-z.2/CC-Switch-ZL-4.0.19-z.2-Windows-arm64-Portable.zip")
+            portable_zip_url("v4.0.23.1", true).as_deref(),
+            Some("https://github.com/jlxzl/cc-switch/releases/download/v4.0.23.1/CC-Switch-ZL-4.0.23.1-Windows-arm64-Portable.zip")
         );
         for bad in ["", "v", "latest", "4.0/../x", "4.0.0?x=1"] {
             assert!(portable_zip_url(bad, false).is_none(), "{bad}");

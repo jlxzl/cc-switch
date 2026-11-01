@@ -91,6 +91,12 @@ describe("language and links", () => {
     expect(changelogUrl("en", "4.0.2")).toBe(
       "https://github.com/jlxzl/cc-switch/releases/tag/v4.0.2",
     );
+    expect(changelogUrl("en", "4.0.23-z.1")).toBe(
+      "https://github.com/jlxzl/cc-switch/releases/tag/v4.0.23.1",
+    );
+    expect(changelogUrl("en", "4.0.23-z")).toBe(
+      "https://github.com/jlxzl/cc-switch/releases/tag/v4.0.23",
+    );
     expect(changelogUrl("zh-TW")).toBe(
       "https://github.com/jlxzl/cc-switch/releases",
     );

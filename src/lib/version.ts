@@ -114,3 +114,11 @@ export function isUpdateAvailable(
   if (!current || !latest) return false;
   return compareVersions(latest, current) > 0;
 }
+
+/**
+ * 内部 semver 转对外版本：`4.0.23-z.1` → `4.0.23.1`，`4.0.23-z` → `4.0.23`。
+ * 对外版本用主版本加序号，内部仍保留 semver 预发布后缀用于自动更新比较。
+ */
+export function toPublicVersion(version: string): string {
+  return version.replace(/-z\.(\d+)$/, ".$1").replace(/-z$/, "");
+}

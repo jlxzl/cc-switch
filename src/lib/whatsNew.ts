@@ -1,4 +1,4 @@
-import { compareVersions } from "@/lib/version";
+import { compareVersions, toPublicVersion } from "@/lib/version";
 
 /**
  * 更新摘要：每个版本一份 `src/whats-new/<version>.json`，构建时打进安装包。
@@ -91,11 +91,13 @@ export function resolveWhatsNewLanguage(language: string): WhatsNewLanguage {
     : "en";
 }
 
-/** 本仓库发布日志：不带版本是列表页，带版本是 tag 页 */
+/** 本仓库发布日志：不带版本是列表页，带版本是 tag 页（tag 用对外版本） */
 export function changelogUrl(
   _language: WhatsNewLanguage,
   version?: string,
 ): string {
   const base = "https://github.com/jlxzl/cc-switch/releases";
-  return version ? `${base}/tag/v${version.replace(/^v/, "")}` : base;
+  return version
+    ? `${base}/tag/v${toPublicVersion(version.replace(/^v/, ""))}`
+    : base;
 }

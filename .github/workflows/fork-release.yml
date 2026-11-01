@@ -1,0 +1,114 @@
+name: Fork Release (Windows)
+
+# 手动触发或推送 v*-z* 标签时，构建 Windows x64 安装包并发 GitHub Release。
+# 当前不生成 Tauri updater 产物：仓库没有配置签名私钥，先关掉 createUpdaterArtifacts。
+on:
+  push:
+    tags:
+      - 'v*-z*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fork-release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        shell: bash
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+        run: |
+          corepack enable
+          corepack install
+          pnpm --version
+
+      - name: Read pinned Rust toolchain
+        id: rust-toolchain
+        shell: bash
+        run: |
+          channel=$(sed -nE 's/^channel *= *"([^"]+)".*/\1/p' rust-toolchain.toml)
+          test -n "$channel"
+          echo "channel=$channel" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ steps.rust-toolchain.outputs.channel }}
+
+      - name: Install frontend deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            version="${GITHUB_REF_NAME#v}"
+          else
+            version=$(node -p "require('./package.json').version")
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+          echo "Building $version"
+
+      - name: Build Windows MSI
+        shell: bash
+        run: pnpm tauri build --bundles msi --config src-tauri/tauri.release.json
+
+      - name: Prepare release assets
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force -Path release-assets | Out-Null
+
+          $msi = Get-ChildItem -Path 'src-tauri/target/release/bundle/msi' -Recurse -Include *.msi |
+            Select-Object -First 1
+          if ($null -eq $msi) { throw 'No MSI installer found' }
+          $msiName = "CC-Switch-ZL-$env:VERSION-Windows.msi"
+          Copy-Item $msi.FullName (Join-Path release-assets $msiName)
+
+          $exe = 'src-tauri/target/release/cc-switch.exe'
+          if (-not (Test-Path $exe)) { throw 'No cc-switch.exe found' }
+          $zipName = "CC-Switch-ZL-$env:VERSION-Windows-Portable.zip"
+          Compress-Archive -Path $exe -DestinationPath (Join-Path release-assets $zipName) -Force
+
+          Get-ChildItem release-assets | Select-Object Name, Length
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: CC Switch ZL ${{ steps.version.outputs.version }}
+          prerelease: false
+          draft: false
+          fail_on_unmatched_files: true
+          body: |
+            ## CC Switch ZL ${{ steps.version.outputs.version }}
+
+            Windows x64 非官方定制构建。
+
+            官方仓库：https://github.com/farion1231/cc-switch
+
+            - `CC-Switch-ZL-${{ steps.version.outputs.version }}-Windows.msi`：安装版
+            - `CC-Switch-ZL-${{ steps.version.outputs.version }}-Windows-Portable.zip`：便携版，解压即用
+
+            > 未做代码签名，Windows SmartScreen 可能提示。
+          files: release-assets/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

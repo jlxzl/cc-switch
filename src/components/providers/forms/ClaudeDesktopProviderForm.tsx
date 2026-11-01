@@ -1112,7 +1112,10 @@ export function ClaudeDesktopProviderForm({
                         <Switch
                           checked={xaiPriority}
                           onCheckedChange={setXaiPriority}
-                          aria-label={t("claudeDesktop.xaiPriority", "Priority")}
+                          aria-label={t(
+                            "claudeDesktop.xaiPriority",
+                            "Priority",
+                          )}
                         />
                       </div>
                     )}

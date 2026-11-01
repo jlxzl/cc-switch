@@ -71,9 +71,9 @@ jobs:
           echo "tag=v$version" >> "$GITHUB_OUTPUT"
           echo "Building $version"
 
-      - name: Build Windows MSI
+      - name: Build Windows installer
         shell: bash
-        run: pnpm tauri build --bundles msi --config src-tauri/tauri.release.json
+        run: pnpm tauri build --bundles nsis --config src-tauri/tauri.release.json
 
       - name: Prepare release assets
         shell: pwsh
@@ -83,11 +83,11 @@ jobs:
           $ErrorActionPreference = 'Stop'
           New-Item -ItemType Directory -Force -Path release-assets | Out-Null
 
-          $msi = Get-ChildItem -Path 'src-tauri/target/release/bundle/msi' -Recurse -Include *.msi |
+          $installer = Get-ChildItem -Path 'src-tauri/target/release/bundle/nsis' -Recurse -Include *-setup.exe |
             Select-Object -First 1
-          if ($null -eq $msi) { throw 'No MSI installer found' }
-          $msiName = "CC-Switch-ZL-$env:VERSION-Windows.msi"
-          Copy-Item $msi.FullName (Join-Path release-assets $msiName)
+          if ($null -eq $installer) { throw 'No NSIS installer found' }
+          $installerName = "CC-Switch-ZL-$env:VERSION-Windows-Setup.exe"
+          Copy-Item $installer.FullName (Join-Path release-assets $installerName)
 
           $exe = 'src-tauri/target/release/cc-switch.exe'
           if (-not (Test-Path $exe)) { throw 'No cc-switch.exe found' }
@@ -111,7 +111,7 @@ jobs:
 
             官方仓库：https://github.com/farion1231/cc-switch
 
-            - `CC-Switch-ZL-${{ steps.version.outputs.version }}-Windows.msi`：安装版
+            - `CC-Switch-ZL-${{ steps.version.outputs.version }}-Windows-Setup.exe`：安装版
             - `CC-Switch-ZL-${{ steps.version.outputs.version }}-Windows-Portable.zip`：便携版，解压即用
 
             > 未做代码签名，Windows SmartScreen 可能提示。

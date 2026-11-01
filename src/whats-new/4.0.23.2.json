@@ -1,0 +1,27 @@
+{
+  "version": "4.0.23.2",
+  "channel": "zl",
+  "items": [
+    {
+      "type": "improve",
+      "zh": "Windows 安装包改用 CC Switch 图标",
+      "zh-TW": "Windows 安裝包改用 CC Switch 圖示",
+      "en": "The Windows installer now uses the CC Switch icon",
+      "ja": "Windows インストーラーのアイコンを CC Switch に変更"
+    },
+    {
+      "type": "fix",
+      "zh": "侧栏版本号不再显示内部的 -z 后缀",
+      "zh-TW": "側欄版本號不再顯示內部的 -z 後綴",
+      "en": "The sidebar version no longer shows the internal -z suffix",
+      "ja": "サイドバーのバージョンから内部の -z 表記を削除"
+    },
+    {
+      "type": "fix",
+      "zh": "更新日志和数据库升级提示改指本仓库",
+      "zh-TW": "更新日誌和資料庫升級提示改指本儲存庫",
+      "en": "Release notes and the database upgrade hint now open this repository",
+      "ja": "更新履歴とデータベース更新の案内をこのリポジトリに変更"
+    }
+  ]
+}

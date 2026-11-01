@@ -104,6 +104,41 @@ jobs:
 
           Get-ChildItem release-assets | Select-Object Name, Length
 
+      - name: Prepare release body
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $notesPath = "docs/release-notes/zl/v$env:VERSION.md"
+          if (Test-Path $notesPath) {
+            $body = [System.IO.File]::ReadAllText(
+              (Resolve-Path $notesPath),
+              [System.Text.Encoding]::UTF8
+            )
+            $body = [regex]::Replace($body, '(?s)<!--\s*summary:.*?-->', '').Trim()
+            $body = [regex]::Replace($body, '(\r?\n){3,}', "`n`n")
+          } else {
+            $lines = @(
+              "## CC Switch ZL $env:VERSION",
+              "",
+              "Windows x64 非官方定制构建。",
+              "",
+              "官方仓库：https://github.com/farion1231/cc-switch",
+              "",
+              "- ``CC-Switch-ZL-$env:VERSION-Windows-Setup.exe``：安装版",
+              "- ``CC-Switch-ZL-$env:VERSION-Windows-Portable.zip``：便携版，解压即用",
+              "",
+              "> 安装包未做 Windows 代码签名，SmartScreen 可能提示；更新包本身已用本仓库密钥签名。"
+            )
+            $body = $lines -join "`n"
+          }
+          [System.IO.File]::WriteAllText(
+            (Join-Path (Get-Location) 'release-notes.md'),
+            $body,
+            [System.Text.UTF8Encoding]::new($false)
+          )
+
       - name: Generate latest.json
         shell: pwsh
         env:
@@ -116,9 +151,19 @@ jobs:
             Select-Object -First 1
           if ($null -eq $setup -or $null -eq $sig) { throw 'Missing NSIS installer or signature' }
           $tag = "v$env:VERSION"
+          $notesPath = "docs/release-notes/zl/v$env:VERSION.md"
+          $summary = "CC Switch ZL $env:VERSION"
+          if (Test-Path $notesPath) {
+            $notesText = [System.IO.File]::ReadAllText(
+              (Resolve-Path $notesPath),
+              [System.Text.Encoding]::UTF8
+            )
+            $match = [regex]::Match($notesText, '(?s)<!--\s*summary:\s*(.*?)\s*-->')
+            if ($match.Success) { $summary = $match.Groups[1].Value.Trim() }
+          }
           $manifest = [ordered]@{
             version = $env:VERSION
-            notes = "CC Switch ZL $env:VERSION"
+            notes = $summary
             pub_date = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
             platforms = [ordered]@{
               'windows-x86_64' = [ordered]@{
@@ -143,17 +188,7 @@ jobs:
           prerelease: false
           draft: false
           fail_on_unmatched_files: true
-          body: |
-            ## CC Switch ZL ${{ steps.version.outputs.version }}
-
-            Windows x64 非官方定制构建。
-
-            官方仓库：https://github.com/farion1231/cc-switch
-
-            - `CC-Switch-ZL-${{ steps.version.outputs.version }}-Windows-Setup.exe`：安装版
-            - `CC-Switch-ZL-${{ steps.version.outputs.version }}-Windows-Portable.zip`：便携版，解压即用
-
-            > 安装包未做 Windows 代码签名，SmartScreen 可能提示；更新包本身已用本仓库密钥签名。
+          body_path: release-notes.md
           files: release-assets/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

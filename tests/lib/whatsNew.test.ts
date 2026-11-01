@@ -103,11 +103,12 @@ describe("language and links", () => {
     expect(changelogUrl("en", "4.0.2")).toBe(
       "https://github.com/jlxzl/cc-switch/releases/tag/v4.0.2",
     );
-    expect(changelogUrl("en", "4.0.23-z.1")).toBe(
+    expect(changelogUrl("en", "4.0.23.1")).toBe(
       "https://github.com/jlxzl/cc-switch/releases/tag/v4.0.23.1",
     );
+    // 老条目按它实际发布的标签打开，不转成对外版本（fork 没有 v4.0.23 标签）
     expect(changelogUrl("en", "4.0.23-z")).toBe(
-      "https://github.com/jlxzl/cc-switch/releases/tag/v4.0.23",
+      "https://github.com/jlxzl/cc-switch/releases/tag/v4.0.23-z",
     );
     expect(changelogUrl("zh-TW")).toBe(
       "https://github.com/jlxzl/cc-switch/releases",

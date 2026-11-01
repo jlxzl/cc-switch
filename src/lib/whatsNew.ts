@@ -1,4 +1,4 @@
-import { compareVersions, toPublicVersion } from "@/lib/version";
+import { compareVersions } from "@/lib/version";
 
 /**
  * 更新摘要：每个版本一份 `src/whats-new/<version>.json`，构建时打进安装包。
@@ -90,13 +90,15 @@ export function resolveWhatsNewLanguage(language: string): WhatsNewLanguage {
     : "en";
 }
 
-/** 本仓库发布日志：不带版本是列表页，带版本是 tag 页（tag 用对外版本） */
+/**
+ * 本仓库发布日志：不带版本是列表页，带版本是 tag 页。
+ * 条目里存的就是发布标签对应的版本：老的 ZL 条目是内部的 `-z` 形式，
+ * 新的条目是对外版本（如 `4.0.23.1`），这里不要做转换，否则会指向不存在的标签。
+ */
 export function changelogUrl(
   _language: WhatsNewLanguage,
   version?: string,
 ): string {
   const base = "https://github.com/jlxzl/cc-switch/releases";
-  return version
-    ? `${base}/tag/v${toPublicVersion(version.replace(/^v/, ""))}`
-    : base;
+  return version ? `${base}/tag/v${version.replace(/^v/, "")}` : base;
 }

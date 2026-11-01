@@ -24,6 +24,7 @@ import {
 import type { AppId } from "@/lib/api";
 import type { VisibleApps } from "@/types";
 import { orderAppIds } from "@/config/appConfig";
+import { toPublicVersion } from "@/lib/version";
 import type { GlobalPage, SettingsSection, View } from "@/lib/navigation";
 import { isAppPage } from "@/lib/navigation";
 import { SkillsIcon } from "@/components/BrandIcons";
@@ -767,7 +768,7 @@ function SettingsDirectory({
       </div>
       {!collapsed && version && (
         <div className="shrink-0 px-4 pb-4 text-caption text-fg-3">
-          CC Switch v{version}
+          CC Switch v{toPublicVersion(version)}
         </div>
       )}
     </>

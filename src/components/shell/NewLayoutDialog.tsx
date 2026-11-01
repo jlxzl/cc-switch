@@ -16,9 +16,10 @@ import { APP_IDS } from "@/config/appConfig";
 import { providersApi, settingsApi } from "@/lib/api";
 import { useSettingsQuery } from "@/lib/query";
 import { markSeen } from "@/lib/whatsNew";
+import { toPublicVersion } from "@/lib/version";
 import type { Settings } from "@/types";
 
-const RELEASES_URL = "https://github.com/farion1231/cc-switch/releases";
+const RELEASES_URL = "https://github.com/jlxzl/cc-switch/releases";
 
 /** 任一应用的数据库里已经有供应商（找到一家就停） */
 async function hasAnyProvider(): Promise<boolean> {
@@ -97,7 +98,9 @@ export function NewLayoutDialog() {
     try {
       const version = await getVersion();
       await settingsApi.openExternal(
-        version ? `${RELEASES_URL}/tag/v${version}` : RELEASES_URL,
+        version
+          ? `${RELEASES_URL}/tag/v${toPublicVersion(version)}`
+          : RELEASES_URL,
       );
     } catch (error) {
       console.error("Failed to open release notes:", error);

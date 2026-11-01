@@ -98,7 +98,8 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
   );
   const [showMaintenance, setShowMaintenance] = useState(false);
   const versionClickCount = useRef(0);
-  const officialPromptEnabled = settings?.officialUpdatePromptEnabled ?? true;
+  // 官方版本只给维护者做同步提醒，默认关闭；在关于页连点版本号 7 次后的隐藏开关里打开。
+  const officialPromptEnabled = settings?.officialUpdatePromptEnabled ?? false;
   const baseVersion = useMemo(
     () => (version ? version.split("-")[0] : ""),
     [version],
@@ -141,6 +142,7 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
   }, []);
 
   useEffect(() => {
+    if (!officialPromptEnabled) return;
     let active = true;
     let checkedAt = 0;
     try {
@@ -176,7 +178,7 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [officialPromptEnabled]);
 
   const handleOpenReleaseNotes = useCallback(async () => {
     try {
@@ -326,25 +328,29 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
                 >
                   {`${t("settings.zlVersion")} v${displayVersion}`}
                 </span>
-                <span className="tabular-nums">
-                  {`${t("settings.officialVersion")} `}
-                  {officialVersion
-                    ? `v${officialVersion}`
-                    : t("settings.officialVersionUnknown")}
-                </span>
-                {officialVersion && officialPromptEnabled && (
-                  <Badge
-                    variant="outline"
-                    className={`gap-1 px-1.5 py-0 text-badge ${
-                      officialBehind
-                        ? "border-amber-500/40 text-amber-600 dark:text-amber-400"
-                        : "text-fg-2"
-                    }`}
-                  >
-                    {officialBehind
-                      ? t("settings.officialVersionBehind")
-                      : t("settings.officialVersionSynced")}
-                  </Badge>
+                {officialPromptEnabled && (
+                  <>
+                    <span className="tabular-nums">
+                      {`${t("settings.officialVersion")} `}
+                      {officialVersion
+                        ? `v${officialVersion}`
+                        : t("settings.officialVersionUnknown")}
+                    </span>
+                    {officialVersion && (
+                      <Badge
+                        variant="outline"
+                        className={`gap-1 px-1.5 py-0 text-badge ${
+                          officialBehind
+                            ? "border-amber-500/40 text-amber-600 dark:text-amber-400"
+                            : "text-fg-2"
+                        }`}
+                      >
+                        {officialBehind
+                          ? t("settings.officialVersionBehind")
+                          : t("settings.officialVersionSynced")}
+                      </Badge>
+                    )}
+                  </>
                 )}
               </>
             )}

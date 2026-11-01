@@ -83,10 +83,14 @@ export function NewLayoutDialog() {
       // 之前没有记录，摘要本来也只会显示当前这一版；那几条是相对上一个 4.x 预览版
       // 的改动，对他们不如这个弹窗和「查看更新说明」（正式版页面是 4.0 完整说明）有用。
       const version = await getVersion().catch(() => undefined);
+      const publicVersion = version ? toPublicVersion(version) : undefined;
       await settingsApi.save({
         ...rest,
         newLayoutNoticeConfirmed: true,
-        whatsNewSeenVersion: markSeen(settings.whatsNewSeenVersion, version),
+        whatsNewSeenVersion: markSeen(
+          settings.whatsNewSeenVersion,
+          publicVersion,
+        ),
       });
       await queryClient.invalidateQueries({ queryKey: ["settings"] });
     } catch (error) {

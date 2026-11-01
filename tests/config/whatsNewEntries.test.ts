@@ -28,7 +28,7 @@ function problemsOf(path: string, data: unknown): string[] {
   const name = path.split("/").pop()!;
   const problems: string[] = [];
 
-  if (!/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?\.json$/.test(name)) {
+  if (!/^\d+\.\d+\.\d+(\.\d+)?(-[0-9A-Za-z.-]+)?\.json$/.test(name)) {
     problems.push(`${name}: file name must be <version>.json`);
   }
   if (!isObject(data)) {

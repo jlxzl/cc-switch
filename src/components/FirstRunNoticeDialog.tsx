@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useSettingsQuery } from "@/lib/query";
 import { settingsApi } from "@/lib/api";
 import { markSeen } from "@/lib/whatsNew";
+import { toPublicVersion } from "@/lib/version";
 
 /** 首次运行欢迎提示：仅当后端启动阶段保留 firstRunNoticeConfirmed 为空时弹出。 */
 export function FirstRunNoticeDialog() {
@@ -31,11 +32,15 @@ export function FirstRunNoticeDialog() {
       const { webdavSync: _, ...rest } = settings;
       // 新装用户看的就是新界面、新版本，「界面改版了」弹窗和更新摘要一并记成已看过
       const version = await getVersion().catch(() => undefined);
+      const publicVersion = version ? toPublicVersion(version) : undefined;
       await settingsApi.save({
         ...rest,
         firstRunNoticeConfirmed: true,
         newLayoutNoticeConfirmed: true,
-        whatsNewSeenVersion: markSeen(settings.whatsNewSeenVersion, version),
+        whatsNewSeenVersion: markSeen(
+          settings.whatsNewSeenVersion,
+          publicVersion,
+        ),
       });
       await queryClient.invalidateQueries({ queryKey: ["settings"] });
     } catch (error) {

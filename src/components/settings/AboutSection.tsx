@@ -83,7 +83,8 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
     readStarPromptDismissed,
   );
   const recentEntries = useMemo(
-    () => (version ? entriesUpTo(WHATS_NEW_ENTRIES, version) : []),
+    () =>
+      version ? entriesUpTo(WHATS_NEW_ENTRIES, toPublicVersion(version)) : [],
     [version],
   );
 

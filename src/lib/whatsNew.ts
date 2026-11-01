@@ -18,6 +18,8 @@ export type WhatsNewItem = { type: WhatsNewItemType } & Record<
 
 export interface WhatsNewEntry {
   version: string;
+  /** ZL 自己的发布加这个标记；上游版本的条目不写，也不进 Z 版的「近期更新」 */
+  channel?: "zl";
   /** 空数组 = 这一版不弹窗（纯构建、CI 之类的版本） */
   items: WhatsNewItem[];
 }
@@ -28,11 +30,8 @@ const modules = import.meta.glob<WhatsNewEntry>("../whats-new/*.json", {
 });
 
 /** Z 版本摘要；上游版本的条目不进入 Z 版的「近期更新」 */
-const isZlVersion = (version: string) => /-z(?:\.|$)/.test(version);
-
-/** 本仓库 Z 版本的摘要，新到旧 */
 export const WHATS_NEW_ENTRIES: WhatsNewEntry[] = Object.values(modules)
-  .filter((entry) => isZlVersion(entry.version))
+  .filter((entry) => entry.channel === "zl")
   .sort((a, b) => compareVersions(b.version, a.version));
 
 /** 当前版本比记录的已看版本新（或从没记录过）：需要处理一次 */

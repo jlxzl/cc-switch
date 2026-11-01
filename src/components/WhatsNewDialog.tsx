@@ -167,6 +167,9 @@ export function WhatsNewNotice() {
     queryFn: () => getVersion(),
     staleTime: Infinity,
   });
+  const publicVersion = currentVersion
+    ? toPublicVersion(currentVersion)
+    : undefined;
   const [closed, setClosed] = useState(false);
   const stampedRef = useRef(false);
 
@@ -175,15 +178,15 @@ export function WhatsNewNotice() {
     settings != null &&
     settings.firstRunNoticeConfirmed === true &&
     newLayoutPending === false &&
-    !!currentVersion &&
-    isNewerThanSeen(currentVersion, seen);
+    !!publicVersion &&
+    isNewerThanSeen(publicVersion, seen);
 
   const entries = useMemo(
     () =>
-      due && currentVersion
-        ? entriesSince(WHATS_NEW_ENTRIES, seen, currentVersion)
+      due && publicVersion
+        ? entriesSince(WHATS_NEW_ENTRIES, seen, publicVersion)
         : [],
-    [due, seen, currentVersion],
+    [due, seen, publicVersion],
   );
 
   // 打开时把内容定格：确认后设置刷新、区间变空，关闭动画里内容不会被清掉
@@ -197,21 +200,21 @@ export function WhatsNewNotice() {
 
   const acknowledge = useCallback(async () => {
     setClosed(true);
-    if (!settings || !currentVersion) return;
+    if (!settings || !publicVersion) return;
     try {
       const { webdavSync: _, ...rest } = settings;
       await settingsApi.save({
         ...rest,
         whatsNewSeenVersion: markSeen(
           settings.whatsNewSeenVersion,
-          currentVersion,
+          publicVersion,
         ),
       });
       await queryClient.invalidateQueries({ queryKey: ["settings"] });
     } catch (error) {
       console.error("Failed to save whatsNewSeenVersion:", error);
     }
-  }, [settings, currentVersion, queryClient]);
+  }, [settings, publicVersion, queryClient]);
 
   // 区间里没有可显示的内容：静默记下当前版本，下次升级才有准确的起点
   useEffect(() => {
@@ -227,7 +230,7 @@ export function WhatsNewNotice() {
       open={!closed}
       onClose={() => void acknowledge()}
       entries={shown.entries}
-      updatedTo={currentVersion}
+      updatedTo={publicVersion}
       since={shown.since}
     />
   );

@@ -1,5 +1,6 @@
 {
-  "version": "4.0.23-z",
+  "version": "4.0.23.1",
+  "channel": "zl",
   "items": [
     {
       "type": "new",

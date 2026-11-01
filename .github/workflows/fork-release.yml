@@ -1,7 +1,7 @@
 name: Fork Release (Windows)
 
 # 手动触发或推送 v*-z* 标签时，构建 Windows x64 安装包并发 GitHub Release。
-# 当前不生成 Tauri updater 产物：仓库没有配置签名私钥，先关掉 createUpdaterArtifacts。
+# 安装包用仓库自己的签名密钥签名，旧版 Z 应用通过 latest.json 自动更新。
 on:
   push:
     tags:
@@ -73,7 +73,10 @@ jobs:
 
       - name: Build Windows installer
         shell: bash
-        run: pnpm tauri build --bundles nsis --config src-tauri/tauri.release.json
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: pnpm tauri build --bundles nsis
 
       - name: Prepare release assets
         shell: pwsh
@@ -89,12 +92,48 @@ jobs:
           $installerName = "CC-Switch-ZL-$env:VERSION-Windows-Setup.exe"
           Copy-Item $installer.FullName (Join-Path release-assets $installerName)
 
+          $sig = Get-ChildItem -Path 'src-tauri/target/release/bundle/nsis' -Recurse -Include *-setup.exe.sig |
+            Select-Object -First 1
+          if ($null -eq $sig) { throw 'No updater signature found' }
+          Copy-Item $sig.FullName (Join-Path release-assets "$installerName.sig")
+
           $exe = 'src-tauri/target/release/cc-switch.exe'
           if (-not (Test-Path $exe)) { throw 'No cc-switch.exe found' }
           $zipName = "CC-Switch-ZL-$env:VERSION-Windows-Portable.zip"
           Compress-Archive -Path $exe -DestinationPath (Join-Path release-assets $zipName) -Force
 
           Get-ChildItem release-assets | Select-Object Name, Length
+
+      - name: Generate latest.json
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $setup = Get-ChildItem -Path release-assets -Filter '*-Windows-Setup.exe' |
+            Select-Object -First 1
+          $sig = Get-ChildItem -Path release-assets -Filter '*-Windows-Setup.exe.sig' |
+            Select-Object -First 1
+          if ($null -eq $setup -or $null -eq $sig) { throw 'Missing NSIS installer or signature' }
+          $tag = "v$env:VERSION"
+          $manifest = [ordered]@{
+            version = $env:VERSION
+            notes = "CC Switch ZL $env:VERSION"
+            pub_date = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+            platforms = [ordered]@{
+              'windows-x86_64' = [ordered]@{
+                signature = (Get-Content $sig.FullName -Raw).Trim()
+                url = "https://github.com/jlxzl/cc-switch/releases/download/$tag/$($setup.Name)"
+              }
+            }
+          }
+          $json = $manifest | ConvertTo-Json -Depth 5
+          [System.IO.File]::WriteAllText(
+            (Join-Path (Get-Location) 'release-assets/latest.json'),
+            $json,
+            [System.Text.UTF8Encoding]::new($false)
+          )
+          Get-Content release-assets/latest.json
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v3
@@ -114,7 +153,7 @@ jobs:
             - `CC-Switch-ZL-${{ steps.version.outputs.version }}-Windows-Setup.exe`：安装版
             - `CC-Switch-ZL-${{ steps.version.outputs.version }}-Windows-Portable.zip`：便携版，解压即用
 
-            > 未做代码签名，Windows SmartScreen 可能提示。
+            > 安装包未做 Windows 代码签名，SmartScreen 可能提示；更新包本身已用本仓库密钥签名。
           files: release-assets/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

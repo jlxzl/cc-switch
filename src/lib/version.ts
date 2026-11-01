@@ -16,6 +16,8 @@
 interface ParsedVersion {
   /** 主版本三段 [major, minor, patch] */
   core: [number, number, number];
+  /** 第四段：ZL 对外版本（4.0.23.1）的修订号；没有时为 0 */
+  revision: number;
   /** 预发布标识符段,如 "2.1.156-beta.1" → ["beta", "1"];正式版为空数组 */
   pre: string[];
   /** local version 段("0.22.1+238.g<sha>" → "238.g<sha>");正式版为 null。是否为开发构建由 isDevLocal 判定 */
@@ -23,18 +25,21 @@ interface ParsedVersion {
 }
 
 /**
- * 解析 "2.1.156" / "2.1.156-beta.1" / "0.22.1+238.g8211bb9"(开发构建);
+ * 解析 "2.1.156" / "4.0.23.1" / "2.1.156-beta.1" / "0.22.1+238.g8211bb9"(开发构建);
  * 无法解析返回 null。
  */
 function parseVersion(v: string): ParsedVersion | null {
   const m = v
     .trim()
-    .match(/^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?(?:\+([0-9A-Za-z.-]+))?/);
+    .match(
+      /^(\d+)\.(\d+)\.(\d+)(?:\.(\d+))?(?:-([0-9A-Za-z.-]+))?(?:\+([0-9A-Za-z.-]+))?/,
+    );
   if (!m) return null;
   return {
     core: [Number(m[1]), Number(m[2]), Number(m[3])],
-    pre: m[4] ? m[4].split(".") : [],
-    local: m[5] ?? null,
+    revision: m[4] ? Number(m[4]) : 0,
+    pre: m[5] ? m[5].split(".") : [],
+    local: m[6] ?? null,
   };
 }
 
@@ -97,6 +102,9 @@ export function compareVersions(a: string, b: string): number {
   for (let i = 0; i < 3; i++) {
     const d = pa.core[i] - pb.core[i];
     if (d !== 0) return d < 0 ? -1 : 1;
+  }
+  if (pa.revision !== pb.revision) {
+    return pa.revision < pb.revision ? -1 : 1;
   }
   return comparePre(pa.pre, pb.pre);
 }

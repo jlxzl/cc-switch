@@ -52,6 +52,16 @@ describe("entriesSince", () => {
       "4.0.2",
     ]);
   });
+
+  it("returns sub-releases after the seen one", () => {
+    const subReleases: WhatsNewEntry[] = [
+      { version: "4.0.23.2", items: [item("two")] },
+      { version: "4.0.23.1", items: [item("one")] },
+    ];
+    expect(versions(entriesSince(subReleases, "4.0.23.1", "4.0.23.2"))).toEqual(
+      ["4.0.23.2"],
+    );
+  });
 });
 
 describe("entriesUpTo", () => {
@@ -77,6 +87,8 @@ describe("seen version", () => {
     expect(isNewerThanSeen("4.0.2", "4.0.1")).toBe(true);
     expect(isNewerThanSeen("4.0.2", "4.0.2")).toBe(false);
     expect(isNewerThanSeen("4.0.2", "4.0.4")).toBe(false);
+    expect(isNewerThanSeen("4.0.23.2", "4.0.23.1")).toBe(true);
+    expect(isNewerThanSeen("4.0.23.1", "4.0.23.1")).toBe(false);
   });
 });
 

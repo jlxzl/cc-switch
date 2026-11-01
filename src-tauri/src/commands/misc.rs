@@ -87,6 +87,35 @@ pub async fn check_for_updates(handle: AppHandle) -> Result<bool, String> {
     Ok(true)
 }
 
+/// 读取官方最新版本，只用于“是否该同步上游”的提示，不参与更新安装。
+#[tauri::command]
+pub async fn get_official_latest_version() -> Result<Option<String>, String> {
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(10))
+        .build()
+        .map_err(|e| format!("创建请求客户端失败: {e}"))?;
+
+    for url in [
+        "https://github.com/farion1231/cc-switch/releases/latest/download/latest.json",
+        "https://dl.ccswitch.io/latest.json",
+    ] {
+        let Ok(resp) = client.get(url).send().await else {
+            continue;
+        };
+        let Ok(json) = resp.json::<serde_json::Value>().await else {
+            continue;
+        };
+        if let Some(version) = json.get("version").and_then(|value| value.as_str()) {
+            let version = version.trim().trim_start_matches('v');
+            if !version.is_empty() {
+                return Ok(Some(version.to_string()));
+            }
+        }
+    }
+
+    Ok(None)
+}
+
 /// 便携版新版本压缩包的下载地址，命名与 release.yml 的「Prepare Windows Assets」一致：
 /// `CC-Switch-v<版本>-Windows[-arm64]-Portable.zip`。版本号不像版本号时返回 None。
 fn portable_zip_url(version: &str, arm64: bool) -> Option<String> {

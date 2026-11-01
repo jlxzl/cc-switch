@@ -87,10 +87,12 @@ describe("language and links", () => {
     expect(resolveWhatsNewLanguage("fr")).toBe("en");
   });
 
-  it("links to the website changelog, Traditional Chinese uses the zh pages", () => {
+  it("links to the fork releases; a version opens its tag page", () => {
     expect(changelogUrl("en", "4.0.2")).toBe(
-      "https://ccswitch.io/en/changelog/4.0.2",
+      "https://github.com/jlxzl/cc-switch/releases/tag/v4.0.2",
     );
-    expect(changelogUrl("zh-TW")).toBe("https://ccswitch.io/zh/changelog");
+    expect(changelogUrl("zh-TW")).toBe(
+      "https://github.com/jlxzl/cc-switch/releases",
+    );
   });
 });

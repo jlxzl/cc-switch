@@ -1,0 +1,34 @@
+{
+  "version": "4.0.25",
+  "channel": "zl",
+  "items": [
+    {
+      "type": "new",
+      "zh": "用量显示支持自动获取汇率：默认手动，开启后每天更新；自动汇率与手填值分开保存",
+      "zh-TW": "用量顯示支援自動取得匯率：預設手動，開啟後每天更新；自動匯率與手填值分開保存",
+      "en": "Automatic usage exchange rates: manual by default, daily once enabled",
+      "ja": "使用量表示で為替レートを自動取得可能：既定は手動、有効化後は毎日更新、手入力値とは別に保存"
+    },
+    {
+      "type": "improve",
+      "zh": "自动汇率标注数据来源并链接 ExchangeRate-API",
+      "zh-TW": "自動匯率標註資料來源並連結 ExchangeRate-API",
+      "en": "Automatic rates link to ExchangeRate-API or FloatRates",
+      "ja": "自動レートにデータ提供元を表示してリンク"
+    },
+    {
+      "type": "new",
+      "zh": "授权中心可以关掉自动打开浏览器，登录时只复制链接",
+      "zh-TW": "授權中心可以關閉自動開啟瀏覽器，登入時只複製連結",
+      "en": "Sign in by copying the login link instead of opening the browser",
+      "ja": "ブラウザを開かず、ログインリンクのコピーでサインイン可能に"
+    },
+    {
+      "type": "fix",
+      "zh": "修复 GPT 6.1 max 降级、WSL 退出与 DeepSeek 供应商缺失",
+      "zh-TW": "修正 GPT 6.1 max 降級、WSL 退出與 DeepSeek 供應商缺失",
+      "en": "Fixed GPT 6.1 max effort downgrade, WSL exit, and missing DeepSeek providers",
+      "ja": "GPT 6.1 max の格下げ、WSL 終了、DeepSeek 表示を修正"
+    }
+  ]
+}

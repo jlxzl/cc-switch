@@ -124,8 +124,8 @@ export function isUpdateAvailable(
 }
 
 /**
- * 内部 semver 转对外版本：`4.0.23-z.1` → `4.0.23.1`，`4.0.23-z` → `4.0.23`。
- * 对外版本用主版本加序号，内部仍保留 semver 预发布后缀用于自动更新比较。
+ * 兼容旧版 ZL 构建的 `-z` 后缀：`4.0.23-z.1` → `4.0.23.1`，`4.0.23-z` → `4.0.23`。
+ * 新版本不再使用 `-z`，内部与对外都是三位 semver（如 `4.0.25`），原样返回。
  */
 export function toPublicVersion(version: string): string {
   return version.replace(/-z\.(\d+)$/, ".$1").replace(/-z$/, "");

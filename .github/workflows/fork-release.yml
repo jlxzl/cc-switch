@@ -63,7 +63,7 @@ jobs:
         shell: bash
         run: |
           internal=$(node -p "require('./package.json').version")
-          display=$(printf '%s' "$internal" | sed -E 's/-z\.([0-9]+)$/.\1/; s/-z$//')
+          display="$internal"
           if [ "$GITHUB_REF_TYPE" = "tag" ]; then
             ref_version="${GITHUB_REF_NAME#v}"
             if [ "$ref_version" != "$display" ]; then

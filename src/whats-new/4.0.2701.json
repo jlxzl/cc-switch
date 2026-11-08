@@ -1,0 +1,34 @@
+{
+  "version": "4.0.2701",
+  "channel": "zl",
+  "items": [
+    {
+      "type": "new",
+      "zh": "会话管理可以按消息正文搜索",
+      "zh-TW": "會話管理可以按訊息內文搜尋",
+      "en": "Search sessions by message text",
+      "ja": "セッションをメッセージ本文で検索可能に"
+    },
+    {
+      "type": "new",
+      "zh": "设置里新增界面密度和界面缩放",
+      "zh-TW": "設定新增介面密度和介面縮放",
+      "en": "New interface density and zoom settings",
+      "ja": "画面密度と画面ズームの設定を追加"
+    },
+    {
+      "type": "new",
+      "zh": "授权中心显示每个账号的订阅计划",
+      "zh-TW": "授權中心顯示每個帳號的訂閱方案",
+      "en": "Auth center shows each account's subscription plan",
+      "ja": "認証センターに各アカウントのサブスクリプションを表示"
+    },
+    {
+      "type": "fix",
+      "zh": "配置文件是软链接时不再被替换或写入失败",
+      "zh-TW": "設定檔是符號連結時不再被取代或寫入失敗",
+      "en": "Symlinked config files are no longer replaced or fail to write",
+      "ja": "設定ファイルがシンボリックリンクでも置換・書き込み失敗しないように"
+    }
+  ]
+}

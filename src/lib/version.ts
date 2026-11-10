@@ -146,4 +146,3 @@ export function toOfficialBaseVersion(version: string): string {
   const officialPatch = patch >= 100 ? Math.floor(patch / 100) : patch;
   return `${major}.${minor}.${officialPatch}`;
 }
-

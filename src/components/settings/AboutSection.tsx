@@ -19,7 +19,7 @@ import { getVersion } from "@tauri-apps/api/app";
 import { settingsApi } from "@/lib/api";
 import { useUpdate } from "@/contexts/UpdateContext";
 import { useSaveSettingsMutation, useSettingsQuery } from "@/lib/query";
-import { compareVersions, toPublicVersion } from "@/lib/version";
+import { compareVersions, toOfficialBaseVersion, toPublicVersion } from "@/lib/version";
 import { Badge } from "@/components/ui/badge";
 import { WhatsNewDialog } from "@/components/WhatsNewDialog";
 import { WHATS_NEW_ENTRIES, entriesUpTo } from "@/lib/whatsNew";
@@ -109,7 +109,12 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
       Boolean(
         officialVersion &&
           baseVersion &&
-          compareVersions(officialVersion, baseVersion) > 0,
+          // ZL 版本 patch 段编码了「官方 patch × 100 + 序号」，要先还原成官方基线
+          // 再比较，否则 4.0.2701 会被当成比官方 4.0.28 新
+          compareVersions(
+            officialVersion,
+            toOfficialBaseVersion(baseVersion),
+          ) > 0,
       ),
     [baseVersion, officialVersion],
   );

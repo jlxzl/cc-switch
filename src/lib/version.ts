@@ -130,3 +130,20 @@ export function isUpdateAvailable(
 export function toPublicVersion(version: string): string {
   return version.replace(/-z\.(\d+)$/, ".$1").replace(/-z$/, "");
 }
+
+/**
+ * 从 ZL 版本取出对应的官方基线版本，用于和官方版本比较。
+ *
+ * ZL 的 patch 段编码是「官方 patch × 100 + ZL 构建序号」：`4.0.2701` 对应官方
+ * `4.0.27`。直接拿 ZL 版本和官方版本比会把 2701 当成比 28 新，导致已经落后
+ * 却显示「已同步」。patch 小于 100 的（上游原样版本或旧四段版本）按原 patch
+ * 处理。无法解析时原样返回。
+ */
+export function toOfficialBaseVersion(version: string): string {
+  const parsed = parseVersion(version);
+  if (!parsed) return version;
+  const [major, minor, patch] = parsed.core;
+  const officialPatch = patch >= 100 ? Math.floor(patch / 100) : patch;
+  return `${major}.${minor}.${officialPatch}`;
+}
+

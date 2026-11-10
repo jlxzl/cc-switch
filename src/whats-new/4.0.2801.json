@@ -1,0 +1,34 @@
+{
+  "version": "4.0.2801",
+  "channel": "zl",
+  "items": [
+    {
+      "type": "new",
+      "zh": "统一 Codex 会话历史，官方与第三方会话可来回继续",
+      "zh-TW": "統一 Codex 會話歷史，官方與第三方會話可互相接續",
+      "en": "Codex can now keep official and third-party sessions in one group",
+      "ja": "Codex の公式・第三者セッションを同じグループで続行可能に"
+    },
+    {
+      "type": "new",
+      "zh": "Claude Desktop 上下文计数走本地路由，不再产生付费探针",
+      "zh-TW": "Claude Desktop 上下文計數走本地路由，不再產生付費探針",
+      "en": "Claude Desktop token counting is served by the local route instead of billable probes",
+      "ja": "Claude Desktop のトークン計数はローカルルートで処理し、課金プローブを回避"
+    },
+    {
+      "type": "improve",
+      "zh": "Codex 官方额度保护默认开启，可在设置里关闭",
+      "zh-TW": "Codex 官方額度保護預設開啟，可在設定中關閉",
+      "en": "Codex official quota protection is now on by default",
+      "ja": "Codex の公式クォータ保護を既定で有効化"
+    },
+    {
+      "type": "fix",
+      "zh": "修复 Codex 故障转移时仍带着上一家的模型名",
+      "zh-TW": "修正 Codex 故障轉移時仍帶著上一家的模型名稱",
+      "en": "Fixed Codex failover keeping the previous vendor's model name",
+      "ja": "Codex のフェイルオーバーで前のベンダーのモデル名が残る問題を修正"
+    }
+  ]
+}

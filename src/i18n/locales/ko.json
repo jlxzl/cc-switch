@@ -340,7 +340,20 @@
         "inactive": "모델 매핑 또는 형식 변환이 필요한 공급자를 위해 Claude Desktop 로컬 라우팅을 활성화합니다. 설정된 주소: {{address}}:{{port}}"
       },
       "stopBlockedByTakeover": "다른 앱이 아직 라우팅 모드입니다. 라우팅 서비스를 중지하려면 먼저 해당 앱을 직접 연결로 전환하세요."
-    }
+    },
+    "routeEnabledLabel": "사용",
+    "xaiPriority": "Priority",
+    "xaiPriorityDescription": "service_tier=\"priority\"를 보냅니다. api.x.ai는 이 필드를 받아 응답에 priority를 그대로 돌려줍니다. 기본값은 꺼짐입니다. 2026-10-22에 https://api.x.ai/v1/responses로 짧은 요청을 보내 확인한 결과, 필드는 수락되었고 응답의 service_tier가 default에서 priority로 바뀌었지만 첫 토큰까지의 시간은 빨라지지 않았습니다.",
+    "xaiBuildFastNote": "가져온 모델 목록에 grok-4.7-build-fast가 없는 것은 정상입니다. '요청 모델'에 grok-4.7-build-fast를 직접 입력할 수 있습니다. Grok 카탈로그에서 이 모델은 grok-4.7의 고속 변형이며 가격은 약 2배입니다. api.x.ai의 /v1/responses는 이 ID를 받아들이고 응답의 model은 grok-4.7-build-fast입니다.",
+    "modelIdCopied": "복사됨",
+    "modelIdCopyFailed": "복사 실패",
+    "maxEffortLabel": "최대 강도",
+    "maxEffortUnset": "설정 안 함",
+    "effortLow": "낮음",
+    "effortMedium": "중간",
+    "effortHigh": "높음",
+    "effortXHigh": "매우 높음",
+    "effortMax": "최대"
   },
   "notifications": {
     "providerAdded": "공급자가 추가됨",
@@ -1171,7 +1184,13 @@
     },
     "data": {
       "location": "저장 위치"
-    }
+    },
+    "zlVersion": "Z 버전",
+    "officialVersion": "공식 버전",
+    "officialVersionSynced": "동기화됨",
+    "officialVersionBehind": "새 버전 있음, 동기화 가능",
+    "officialVersionUnknown": "감지되지 않음",
+    "officialPromptLabel": "공식 새 버전 알림(업스트림 동기화용)"
   },
   "apps": {
     "claude": "Claude",

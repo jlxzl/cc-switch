@@ -345,7 +345,15 @@
         "inactive": "Model eşlemeye veya biçim dönüştürmeye ihtiyaç duyan sağlayıcılar için Claude Desktop yerel yönlendirmeyi açın. Yapılandırılmış adres: {{address}}:{{port}}"
       },
       "stopBlockedByTakeover": "Diğer uygulamalar hâlâ Yönlendirme modunda. Yönlendirme hizmetini durdurmadan önce onları Doğrudan bağlantı moduna döndürün."
-    }
+    },
+    "routeEnabledLabel": "Etkinleştir",
+    "maxEffortLabel": "Maksimum çaba",
+    "maxEffortUnset": "Ayarlanmadı",
+    "effortLow": "Düşük",
+    "effortMedium": "Orta",
+    "effortHigh": "Yüksek",
+    "effortXHigh": "Çok yüksek",
+    "effortMax": "Maksimum"
   },
   "notifications": {
     "providerAdded": "Sağlayıcı eklendi",

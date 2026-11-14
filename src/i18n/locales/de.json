@@ -340,7 +340,20 @@
         "inactive": "Schalten Sie das lokale Routing von Claude Desktop für Anbieter ein, die Modellzuordnung oder Formatkonvertierung benötigen. Konfigurierte Adresse: {{address}}:{{port}}"
       },
       "stopBlockedByTakeover": "Andere Apps befinden sich noch im Routing-Modus. Stellen Sie sie zurück auf „Direkt“, bevor Sie den Routing-Dienst beenden."
-    }
+    },
+    "routeEnabledLabel": "Aktivieren",
+    "xaiPriority": "Priority",
+    "xaiPriorityDescription": "Sendet service_tier=\"priority\". api.x.ai akzeptiert das Feld und gibt priority in der Antwort zurück. Standardmäßig aus. Eine kurze Anfrage an https://api.x.ai/v1/responses am 22.10.2026 wurde akzeptiert: service_tier wechselte von default zu priority, die Zeit bis zum ersten Token verbesserte sich nicht.",
+    "xaiBuildFastNote": "Die abgerufene Modellliste enthält grok-4.7-build-fast nicht; das ist zu erwarten. Du kannst grok-4.7-build-fast selbst unter „Angefordertes Modell“ eintragen. Im Grok-Katalog ist es die schnelle Variante von grok-4.7 zum etwa doppelten Preis. /v1/responses auf api.x.ai akzeptiert diese ID, und das Modell in der Antwort ist grok-4.7-build-fast.",
+    "modelIdCopied": "Kopiert",
+    "modelIdCopyFailed": "Kopieren fehlgeschlagen",
+    "maxEffortLabel": "Maximaler Aufwand",
+    "maxEffortUnset": "Nicht gesetzt",
+    "effortLow": "Niedrig",
+    "effortMedium": "Mittel",
+    "effortHigh": "Hoch",
+    "effortXHigh": "Sehr hoch",
+    "effortMax": "Maximal"
   },
   "notifications": {
     "providerAdded": "Anbieter hinzugefügt",
@@ -1171,7 +1184,13 @@
     },
     "data": {
       "location": "Speicherort"
-    }
+    },
+    "zlVersion": "Z-Version",
+    "officialVersion": "Offizielle Version",
+    "officialVersionSynced": "Synchronisiert",
+    "officialVersionBehind": "Neuere Version verfügbar, Synchronisierung möglich",
+    "officialVersionUnknown": "Nicht erkannt",
+    "officialPromptLabel": "Auf neue offizielle Versionen hinweisen (für Upstream-Synchronisierung)"
   },
   "apps": {
     "claude": "Claude",
@@ -4694,7 +4713,10 @@
     "exitAllTitle": "Alle Apps zurück auf Direkt stellen?",
     "exitAllMessage": "Für Apps im Modus Routing oder Aggregation wird ihre Direkt-Konfiguration zurückgeschrieben, danach wird der Routing-Dienst gestoppt. Routing-Ziele, Warteschlangen und Aggregationslisten bleiben erhalten.",
     "exitAllConfirm": "Alle zurück auf Direkt stellen",
-    "failoverHelp": "Passen Sie hier Timeouts, Wiederholungen und Circuit Breaker jeder App an. Warteschlangen werden auf dem Tab „Routing“ der jeweiligen App verwaltet."
+    "failoverHelp": "Passen Sie hier Timeouts, Wiederholungen und Circuit Breaker jeder App an. Warteschlangen werden auf dem Tab „Routing“ der jeweiligen App verwaltet.",
+    "countTokens": "Token-Zählung",
+    "countTokensFollowCurrent": "Aktuellem Anbieter folgen",
+    "countTokensHelp": "Claude Desktop fragt den hier gewählten Anbieter nach der Kontext-Tokenzahl; ohne Auswahl wird der aktuelle Anbieter verwendet. Die Zählung sendet den Kontext an diesen Anbieter und erzeugt nichts; wenn keiner den Endpunkt unterstützt, schätzt CC Switch lokal."
   },
   "quota": {
     "tierShort": "{{label}} {{value}} %",

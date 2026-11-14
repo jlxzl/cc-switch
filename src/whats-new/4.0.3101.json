@@ -1,0 +1,34 @@
+{
+  "version": "4.0.3101",
+  "channel": "zl",
+  "items": [
+    {
+      "type": "new",
+      "zh": "新增 GitHub Copilot CLI 与 WorkBuddy 两个应用，支持自定义模型和账号切换",
+      "zh-TW": "新增 GitHub Copilot CLI 與 WorkBuddy 兩個應用，支援自訂模型與帳號切換",
+      "en": "GitHub Copilot CLI and WorkBuddy are now managed apps, with custom models and account switching",
+      "ja": "GitHub Copilot CLI と WorkBuddy に対応。カスタムモデルとアカウント切り替えをサポート"
+    },
+    {
+      "type": "new",
+      "zh": "新增隐私过滤器，路由转发前替换个人信息和密钥",
+      "zh-TW": "新增隱私過濾器，路由轉發前替換個人資訊與金鑰",
+      "en": "Privacy filter can mask personal data and secrets before routing forwards a request",
+      "ja": "プライバシーフィルターを追加。ルーティング転送前に個人情報とキーを置き換え"
+    },
+    {
+      "type": "new",
+      "zh": "界面新增韩语、俄语和德语，共八种语言",
+      "zh-TW": "介面新增韓語、俄語與德語，共八種語言",
+      "en": "Korean, Russian and German join the UI, for eight languages in total",
+      "ja": "韓国語・ロシア語・ドイツ語の UI を追加。計 8 言語に対応"
+    },
+    {
+      "type": "fix",
+      "zh": "修复 Codex 经路由连第三方报 400、Gemini Native 并行工具与缓存问题",
+      "zh-TW": "修正 Codex 經路由連第三方報 400、Gemini Native 平行工具與快取問題",
+      "en": "Fixed routed Codex 400s from third parties, plus Gemini Native parallel tools and prompt caching",
+      "ja": "ルーティング経由 Codex の 400、Gemini Native の並列ツールとキャッシュの問題を修正"
+    }
+  ]
+}

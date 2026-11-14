@@ -1,6 +1,6 @@
 [package]
 name = "cc-switch"
-version = "4.0.2801"
+version = "4.0.3101"
 description = "CC Switch ZL — 非官方定制构建，上游：https://github.com/farion1231/cc-switch"
 authors = ["Jason Young"]
 license = "MIT"

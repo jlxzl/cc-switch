@@ -4,10 +4,10 @@
   "items": [
     {
       "type": "new",
-      "zh": "新增 GitHub Copilot CLI 与 WorkBuddy 两个应用，支持自定义模型和账号切换",
-      "zh-TW": "新增 GitHub Copilot CLI 與 WorkBuddy 兩個應用，支援自訂模型與帳號切換",
-      "en": "GitHub Copilot CLI and WorkBuddy are now managed apps, with custom models and account switching",
-      "ja": "GitHub Copilot CLI と WorkBuddy に対応。カスタムモデルとアカウント切り替えをサポート"
+      "zh": "新增 Copilot CLI 与 WorkBuddy 两个应用",
+      "zh-TW": "新增 Copilot CLI 與 WorkBuddy 兩個應用",
+      "en": "Copilot CLI and WorkBuddy are now managed apps, with custom models and account switching",
+      "ja": "Copilot CLI と WorkBuddy に対応"
     },
     {
       "type": "new",
@@ -25,10 +25,10 @@
     },
     {
       "type": "fix",
-      "zh": "修复 Codex 经路由连第三方报 400、Gemini Native 并行工具与缓存问题",
-      "zh-TW": "修正 Codex 經路由連第三方報 400、Gemini Native 平行工具與快取問題",
-      "en": "Fixed routed Codex 400s from third parties, plus Gemini Native parallel tools and prompt caching",
-      "ja": "ルーティング経由 Codex の 400、Gemini Native の並列ツールとキャッシュの問題を修正"
+      "zh": "修复 Codex 与 Gemini 经路由时的 400 与缓存问题",
+      "zh-TW": "修正 Codex 與 Gemini 經路由時的 400 與快取問題",
+      "en": "Fixed 400s and prompt caching for routed Codex and Gemini Native",
+      "ja": "Codex と Gemini のルーティング 400 とキャッシュを修正"
     }
   ]
 }

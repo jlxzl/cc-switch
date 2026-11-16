@@ -51,6 +51,7 @@ import {
 } from "@/config/claudeDesktopProviderPresets";
 import {
   fetchCodexOauthModels,
+  claudeModelFetchApiFormat,
   fetchModelsForConfig,
   fetchXaiOauthModels,
   showFetchModelsError,
@@ -790,7 +791,14 @@ export function ClaudeDesktopProviderForm({
 
     setIsFetchingModels(true);
     try {
-      const models = await fetchModelsForConfig(baseUrl.trim(), apiKey.trim());
+      const models = await fetchModelsForConfig(
+        baseUrl.trim(),
+        apiKey.trim(),
+        undefined,
+        undefined,
+        undefined,
+        { apiFormat: claudeModelFetchApiFormat(apiFormat) },
+      );
       setFetchedModels(models);
       toast.success(
         t("providerForm.fetchModelsSuccess", {

@@ -1,0 +1,27 @@
+{
+  "version": "4.0.3601",
+  "channel": "zl",
+  "items": [
+    {
+      "type": "new",
+      "zh": "Claude Desktop 模型映射支持直通、分档停用与最大强度",
+      "zh-TW": "Claude Desktop 模型對應支援直通、分檔停用與最大強度",
+      "en": "Claude Desktop model mappings support passthrough, per-role disable and max effort",
+      "ja": "Claude Desktop のモデル対応でパススルー・段階的な無効化・最大強度に対応"
+    },
+    {
+      "type": "new",
+      "zh": "新增插件页面，可安装、启用、更新各应用的插件",
+      "zh-TW": "新增外掛頁面，可安裝、啟用、更新各應用的外掛",
+      "en": "New Plugins page to install, enable and update plugins for each app",
+      "ja": "プラグインページを追加し、各アプリのプラグインを管理"
+    },
+    {
+      "type": "fix",
+      "zh": "Antigravity 模型列表不再出现重复家族",
+      "zh-TW": "Antigravity 模型清單不再出現重複家族",
+      "en": "Antigravity model list no longer shows duplicate families",
+      "ja": "Antigravity のモデル一覧に重複したファミリーが表示される問題を修正"
+    }
+  ]
+}

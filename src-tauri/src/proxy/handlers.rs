@@ -354,11 +354,7 @@ async fn handle_count_tokens_for_app(
     let (parts, body) = request.into_parts();
     let headers = parts.headers;
     let extensions = parts.extensions;
-    let body_bytes = body
-        .collect()
-        .await
-        .map_err(|e| ProxyError::InvalidRequest(format!("Failed to read request body: {e}")))?
-        .to_bytes();
+    let body_bytes = read_request_body_limited(body, MAX_REQUEST_BODY_BYTES).await?;
     let body: Value = serde_json::from_slice(&body_bytes)
         .map_err(|e| ProxyError::InvalidRequest(format!("Invalid JSON body: {e}")))?;
     drop(body_bytes);

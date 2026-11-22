@@ -1,0 +1,34 @@
+{
+  "version": "4.0.3801",
+  "channel": "zl",
+  "items": [
+    {
+      "type": "fix",
+      "zh": "读不出的供应商和 MCP 条目单独列出，可删除",
+      "zh-TW": "讀不出的供應商和 MCP 條目單獨列出，可刪除",
+      "en": "Unreadable providers and MCP entries are listed separately and can be deleted",
+      "ja": "読めないプロバイダーと MCP 項目を別に表示し削除可能に"
+    },
+    {
+      "type": "new",
+      "zh": "Pi 新增 Mistral AI 预设",
+      "zh-TW": "Pi 新增 Mistral AI 預設",
+      "en": "Pi adds a Mistral AI preset",
+      "ja": "Pi に Mistral AI プリセットを追加"
+    },
+    {
+      "type": "new",
+      "zh": "WorkBuddy 支持一键导入链接",
+      "zh-TW": "WorkBuddy 支援一鍵匯入連結",
+      "en": "WorkBuddy providers can be imported from a deep link",
+      "ja": "WorkBuddy のワンクリック取り込みリンクに対応"
+    },
+    {
+      "type": "improve",
+      "zh": "Linux 可在授权中心切换 Antigravity 账号",
+      "zh-TW": "Linux 可在授權中心切換 Antigravity 帳號",
+      "en": "Switch Antigravity accounts from the Auth Center on Linux",
+      "ja": "Linux の認証センターで Antigravity アカウントを切り替え"
+    }
+  ]
+}

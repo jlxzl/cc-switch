@@ -942,9 +942,9 @@ describe("ClaudeDesktopProviderForm", () => {
     const { unmount } = renderForm(xaiInitialData);
 
     expect(screen.getByRole("switch", { name: "Priority" })).not.toBeChecked();
-    expect(
-      screen.getByText(/获取模型列表不含/).closest("p"),
-    ).toHaveClass("text-destructive");
+    expect(screen.getByText(/获取模型列表不含/).closest("p")).toHaveClass(
+      "text-destructive",
+    );
     expect(
       screen.getAllByRole("button", { name: "grok-4.7-build-fast" }).length,
     ).toBeGreaterThan(0);

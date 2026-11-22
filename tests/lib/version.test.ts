@@ -50,8 +50,8 @@ describe("toOfficialBaseVersion", () => {
       compareVersions("4.0.28", toOfficialBaseVersion("4.0.2701")),
     ).toBeGreaterThan(0);
     // 同一官方基线的 ZL 构建不误报
-    expect(
-      compareVersions("4.0.28", toOfficialBaseVersion("4.0.2801")),
-    ).toBe(0);
+    expect(compareVersions("4.0.28", toOfficialBaseVersion("4.0.2801"))).toBe(
+      0,
+    );
   });
 });
